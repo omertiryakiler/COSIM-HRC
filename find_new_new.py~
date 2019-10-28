@@ -18,12 +18,12 @@ with open('output.hist.txt', 'r') as f_orig:
 		if "------ time" in line:
 			i += 1
 
-#print(position['link_1'])
-#print(position['link_2'])
-#print(position['base'])
-#print(position['arm'])
-#print(position['head'])
-#print(position['endeff'])
+print(position['link_1'])
+print(position['link_2'])
+print(position['base'])
+print(position['arm'])
+print(position['head'])
+print(position['endeff'])
 
 A=[position['link_1'], position['link_2'], position['base'], position['arm'], position['head'], position['endeff']]
 
