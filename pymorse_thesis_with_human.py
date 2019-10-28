@@ -4,6 +4,7 @@ from pymorse import Morse
 import time
 from collections import defaultdict
 
+
 def printer(data):
 	print("Incoming data! " + str(data))
 	file_obj = open ("test.txt", "w+")
