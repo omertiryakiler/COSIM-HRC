@@ -32,6 +32,19 @@ def main():
 	haz = defaultdict()
 	haz = {'HAZARD_OCCURED_': 'hazard_type'}
 
+	hazardrisk = defaultdict(list)
+	hazris = defaultdict()
+	hazris = {'HAZARD_RISK_1 ': 'hazard_risk 1', 'HAZARD_RISK_2 ': 'hazard_risk 2'}
+	H=[]
+	T=[]
+	for hh in range(1,29):
+		H.append('HAZARD_RISK_%s'%hh)
+	for tt in range(1,29):
+		T.append('hazard_risk %s'%tt)
+	t=2	
+	while (t>=2) and (t<=27):
+		hazris.update({H[t]: 'hazard_risk %s'%(t+1)})
+		t=t+1
 	z=False
 
 	for p in parts:
@@ -52,18 +65,26 @@ def main():
 						z=True
 					elif h not in line and ("------ time" in line or "------ end" in line) and z == False:
 						hazard[haz[h]].append('0')
+				for j in hazris:
+					if j in line :
+						hazardrisk[hazris[j]].append(line[-2:])
 			if "------ time" in line:
 				i += 1
 				z=False
 
 	A=[position['link_1'], position['link_2'], position['base'], position['arm'], position['head'], position['endeff']]
 	B=[hazard['hazard_type']]
+	C=[]
+
+	for cc in range(0,27):
+		C.append([hazardrisk[T[cc]]])
 
 	k=0
 	n=len(A)
 	m=len(A[0])
 	print(A)
 	print(B)
+	print(C)
 
 	with Morse("localhost", 4000)  as simu:
 
