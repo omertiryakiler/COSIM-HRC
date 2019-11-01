@@ -3,6 +3,7 @@ import tty, termios
 from pymorse import Morse
 import time
 from collections import defaultdict
+import pdb
 
 
 def printer(data):
@@ -27,9 +28,14 @@ def main():
 	parts = defaultdict()
 	parts = {'BASE_1_IN_L_': 'base', 'LINK1_1_IN_L_': 'link_1','LINK2_1_IN_L_': 'link_2','ENDEFF_1_IN_L_': 'endeff','OPERATOR_1_ARM_AREA_IN_L_': 'arm', 'OPERATOR_1_HEAD_AREA_IN_L_': 'head'}
 #dealing with time = 0
+	hazard = defaultdict(list)
+	haz = defaultdict()
+	haz = {'HAZARD_OCCURED_': 'hazard_type'}
+
+	z=False
+
 	for p in parts:
 		position[parts[p]].append('0')
-#
 
 	with open('output.hist.txt', 'r') as f_orig:
 		i = 0
@@ -38,17 +44,26 @@ def main():
 				for p in parts:
 					if p in line:
 						position[parts[p]].append(line[-2:])
+			if (i > 0):
+				for h in haz:
+					if h in line :
+						hazard[haz[h]].append(line[-3:])
+						#pdb.set_trace()
+						z=True
+					elif h not in line and ("------ time" in line or "------ end" in line) and z == False:
+						hazard[haz[h]].append('0')
 			if "------ time" in line:
 				i += 1
+				z=False
 
 	A=[position['link_1'], position['link_2'], position['base'], position['arm'], position['head'], position['endeff']]
+	B=[hazard['hazard_type']]
 
 	k=0
 	n=len(A)
 	m=len(A[0])
-	z=0
-	t=0
 	print(A)
+	print(B)
 
 	with Morse("localhost", 4000)  as simu:
 
