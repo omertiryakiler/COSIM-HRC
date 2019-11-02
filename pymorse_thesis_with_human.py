@@ -37,12 +37,12 @@ def main():
 	hazris = {'HAZARD_RISK_1 ': 'hazard_risk 1', 'HAZARD_RISK_2 ': 'hazard_risk 2'}
 	H=[]
 	T=[]
-	for hh in range(1,29):
+	for hh in range(1,30):
 		H.append('HAZARD_RISK_%s'%hh)
-	for tt in range(1,29):
+	for tt in range(1,30):
 		T.append('hazard_risk %s'%tt)
 	t=2	
-	while (t>=2) and (t<=27):
+	while (t>=2) and (t<=28):
 		hazris.update({H[t]: 'hazard_risk %s'%(t+1)})
 		t=t+1
 	z=False
@@ -75,9 +75,14 @@ def main():
 	A=[position['link_1'], position['link_2'], position['base'], position['arm'], position['head'], position['endeff']]
 	B=[hazard['hazard_type']]
 	C=[]
+	D=[]
 
-	for cc in range(0,27):
-		C.append([hazardrisk[T[cc]]])
+	for cc in range(0,28):
+		C.append(hazardrisk[T[cc]])
+	for i in range(1,10):
+		D.append("_%s\n"%i)
+	for i in range(10,29):
+		D.append("%s\n"%i)
 
 	k=0
 	n=len(A)
@@ -85,6 +90,7 @@ def main():
 	print(A)
 	print(B)
 	print(C)
+	print(D)
 
 	with Morse("localhost", 4000)  as simu:
 
@@ -154,7 +160,7 @@ def main():
 								simu.rpc('robot.arm', 'place_IK_target', name, coordinate_value, r2)
 
 					if A[3][k] == A[3][k+1]:
-						print("Operators arm stays at %s" % (A[5][k]))
+						print("Operators arm stays at %s" % (A[3][k]))
 					elif (A[3][k] in rotate_needs and A[3][k+1] not in rotate_needs and A[3][k+1] not in hum_init) or (A[3][k] not in rotate_needs and A[3][k] not in hum_init and A[3][k+1] in rotate_needs):
 						print("Operator's arm moves from %s to %s" % (A[3][k], A[3][k+1]))
 						simu.rpc('human', 'toggle_manipulation')
@@ -211,6 +217,16 @@ def main():
 							simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][1][0], head_moves[A[3][k]][A[3][k+1]][1][1])
 						else:
 							simu.rpc('human', 'move_hand', arm_moves[A[3][k]][A[3][k+1]][0], arm_moves[A[3][k]][A[3][k+1]][1])
+					if B[0][k]== '0':
+						print("There is no hazard occured.")
+					else:
+						for i in D:
+							if B[0][k] == i:
+								o=D.index(i)
+								print("Hazard number %s occured."%(o+1))
+								print("Hazard number %s has a risk value %s" %((o+1), C[o][k]))
+						
+						
 					k=k+1
 			elif (c == "0"):
 				pose = simu.robot.arm.armpose
