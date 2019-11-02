@@ -35,16 +35,33 @@ def main():
 	hazardrisk = defaultdict(list)
 	hazris = defaultdict()
 	hazris = {'HAZARD_RISK_1 ': 'hazard_risk 1', 'HAZARD_RISK_2 ': 'hazard_risk 2'}
+
+	hazard_explanation = defaultdict(list)
+	hazar_hit = defaultdict()
+	hazar_entg = defaultdict()
+	hazar_hit = {'hazard_hit 1 ': 'hazard 1', 'hazard_hit 2 ': 'hazard 2'}
+	hazar_entg= {'hazard_entg 17': 'hazard 17'}
+	
+	Haz=[]
 	H=[]
 	T=[]
-	for hh in range(1,30):
+	TT=[]
+	for hh in range(1,29):
 		H.append('HAZARD_RISK_%s'%hh)
-	for tt in range(1,30):
+	for tt in range(1,29):
 		T.append('hazard_risk %s'%tt)
+	for kk in range(1,17):
+		Haz.append('hazard_hit %s'%kk)
+	for kk in range(17,29):
+		Haz.append('hazard_entg %s'%kk)
+	for aa in range(1,29):
+		TT.append('hazard %s'%aa)
 	t=2	
-	while (t>=2) and (t<=28):
+	while (t>=2) and (t<=27):
 		hazris.update({H[t]: 'hazard_risk %s'%(t+1)})
+		hazar_hit.update({Haz[t]: 'hazard %s'%(t+1)})
 		t=t+1
+	print(hazar_hit)
 	z=False
 
 	for p in parts:
@@ -72,13 +89,24 @@ def main():
 				i += 1
 				z=False
 
+	with open('Hazards.lisp', 'r') as f_haz:
+		for line in f_haz:
+			for ha in hazar_hit:
+				if ha in line :
+					hazard_explanation[hazar_hit[ha]].append(line.split("`")[1].split("_area")[0])
+					hazard_explanation[hazar_hit[ha]].append(line.split("`")[2].split(" ")[0])
+				
+
 	A=[position['link_1'], position['link_2'], position['base'], position['arm'], position['head'], position['endeff']]
 	B=[hazard['hazard_type']]
 	C=[]
 	D=[]
+	E=[]
 
 	for cc in range(0,28):
 		C.append(hazardrisk[T[cc]])
+	for aa in range(0,28):
+		E.append(hazard_explanation[TT[aa]])
 	for i in range(1,10):
 		D.append("_%s\n"%i)
 	for i in range(10,29):
@@ -91,7 +119,7 @@ def main():
 	print(B)
 	print(C)
 	print(D)
-
+	print(E)
 	with Morse("localhost", 4000)  as simu:
 
 		esc= 0
@@ -133,6 +161,7 @@ def main():
 			"6\n" : {"4\n": [[0.0, -1.25], [0.3, 0.0], [0.0, -1.25], [0.1, 0.0]]},
 			"7\n" : {"4\n": [[1.1, 0.0], [1.3, 0.0]]}
 			}
+			
 			rinitial = [0.0, 0.0, 0.0]
 			r1 = [3.14, 0.0, 0.0]
 			r2 = [-3.14, 0.0, 0.0] 
@@ -142,7 +171,7 @@ def main():
 
 			if (c == "7"):
 				while (k>=0) and (k<=(m-2)):
-					time.sleep(2) #in each time interval, it waits for 2 seconds to ensure the completion of movement
+					time.sleep(5) #in each time interval, it waits for 2 seconds to ensure the completion of movement
 					if A[5][k] == A[5][k+1]:
 						print("Robot stays at %s" % (A[5][k]))
 					else:
@@ -217,14 +246,18 @@ def main():
 							simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][1][0], head_moves[A[3][k]][A[3][k+1]][1][1])
 						else:
 							simu.rpc('human', 'move_hand', arm_moves[A[3][k]][A[3][k+1]][0], arm_moves[A[3][k]][A[3][k+1]][1])
-					if B[0][k]== '0':
+					if B[0][k+1]== '0':
 						print("There is no hazard occured.")
 					else:
 						for i in D:
-							if B[0][k] == i:
+							if B[0][k+1] == i:
 								o=D.index(i)
 								print("Hazard number %s occured."%(o+1))
-								print("Hazard number %s has a risk value %s" %((o+1), C[o][k]))
+								if (o>=0) and (o<=15):
+									print("Tr on %s by %s"%(E[o][0], E[o][1]))
+								elif (o<=16) and (o>=28):
+									print("Qs on %s by %s"%(E[o][0], E[o][1]))
+								print("Hazard number %s has a risk value %s" %((o+1), C[o][k+1]))
 						
 						
 					k=k+1
