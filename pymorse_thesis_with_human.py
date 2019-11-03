@@ -125,6 +125,9 @@ def main():
 		esc= 0
 
 		while not esc:
+			tab_pos=False
+			mat_pos=True
+			mat_grab=False
 			c = getchar()
 			tinitial = [0.0, 0.0, 1.0]
 			robot_moves = {
@@ -142,6 +145,8 @@ def main():
 			hum_pos = ["0", "2\n", "5\n", "7\n"]
 			rotate_needs =["3\n","6\n"]
 			hum_init = ["0", "2\n"]
+			material_pos = ["3\n"]
+			table_pos = ["4\n"]
 			arm_moves = {
 			"0" : {"1\n":[1.5, 0.0], "3\n": [[0.0, 1.25], [0.4, 0.0]], "5\n": [-0.5, 0.0]},
 			"1\n" : {"3\n":[[0.0, 1.25], [0.4, 0.0]], "5\n": [-2.0, 0.0] },
@@ -161,7 +166,6 @@ def main():
 			"6\n" : {"4\n": [[0.0, -1.25], [0.3, 0.0], [0.0, -1.25], [0.1, 0.0]]},
 			"7\n" : {"4\n": [[1.1, 0.0], [1.3, 0.0]]}
 			}
-			
 			rinitial = [0.0, 0.0, 0.0]
 			r1 = [3.14, 0.0, 0.0]
 			r2 = [-3.14, 0.0, 0.0] 
@@ -171,10 +175,23 @@ def main():
 
 			if (c == "7"):
 				while (k>=0) and (k<=(m-2)):
-					time.sleep(5) #in each time interval, it waits for 2 seconds to ensure the completion of movement
+					time.sleep(2) #in each time interval, it waits for 2 seconds to ensure the completion of movement
+					print("----- From time %s to time %s -----"%(k, k+1))
 					if A[5][k] == A[5][k+1]:
 						print("Robot stays at %s" % (A[5][k]))
 					else:
+						if A[5][k] in table_pos and mat_grab==False and tab_pos==True:
+							time.sleep(2)
+							mat_grab=True
+							tab_pos=False
+							print("Robot grabs the material")
+							simu.rpc('robot.arm.gripper', 'grab')	
+						elif A[5][k] in material_pos and mat_grab==False and mat_pos==True:
+							time.sleep(2)
+							mat_grab=True
+							mat_pos=False
+							print("Robot grabs the material")
+							simu.rpc('robot.arm.gripper', 'grab')					
 						print("Robot's end effector moves from %s to %s"% (A[5][k], A[5][k+1]))
 						coordinate_value = robot_moves[A[5][k]][A[5][k+1]]
 						if (len(coordinate_value) ==3) and A[5][k] not in robot_init and A[5][k+1] not in robot_init:
@@ -187,7 +204,18 @@ def main():
 								simu.rpc('robot.arm', 'place_IK_target', name, coordinate_value, r1)
 							else:
 								simu.rpc('robot.arm', 'place_IK_target', name, coordinate_value, r2)
-
+						if A[5][k+1] in material_pos and mat_grab==True and mat_pos==False:
+							time.sleep(2)
+							mat_grab=False
+							mat_pos=True
+							print("Robot releases the material")
+							simu.rpc('robot.arm.gripper', 'release') 
+						elif A[5][k+1] in table_pos and mat_grab==True and tab_pos==False:
+							time.sleep(2)
+							mat_grab=False
+							tab_pos=True
+							print("Robot releases the material")
+							simu.rpc('robot.arm.gripper', 'release')
 					if A[3][k] == A[3][k+1]:
 						print("Operators arm stays at %s" % (A[3][k]))
 					elif (A[3][k] in rotate_needs and A[3][k+1] not in rotate_needs and A[3][k+1] not in hum_init) or (A[3][k] not in rotate_needs and A[3][k] not in hum_init and A[3][k+1] in rotate_needs):
