@@ -125,9 +125,9 @@ def main():
 		esc= 0
 
 		while not esc:
-			tab_pos=False
-			mat_pos=True
-			mat_grab=False
+			tab_pos=False #the memory of the position where the material will be released. if it is true, it means the material there.
+			mat_pos=True #the memory of the position of the material.
+			mat_grab=False #the memory of the grab. if it is true, it means the material is already grabbed.
 			c = getchar()
 			tinitial = [0.0, 0.0, 1.0]
 			robot_moves = {
@@ -140,13 +140,16 @@ def main():
 			"6\n":{"3\n" : [0.25, 0.0, -1.15], "4\n" : [0.0, 0.95, -0.95], "5\n" :[0.75, 0.45, -0.5] ,"8\n" : [0.0, 0.85, -0.6]},
 			"8\n":{"4\n" : [0.0, 0.2, -0.2], "6\n" : [0.0, -0.85, 0.6]}
 			}
-			robot_init =["0", "6\n"]
-			lay_pos = ["1\n", "4\n"]
-			hum_pos = ["0", "2\n", "5\n", "7\n"]
-			rotate_needs =["3\n","6\n"]
-			hum_init = ["0", "2\n"]
-			material_pos = ["3\n"]
-			table_pos = ["4\n"]
+			robot_init =["0", "6\n"] #initial position of the robot
+			lay_pos = ["1\n", "4\n"] #positions of the layout side
+			hum_pos = ["0", "2\n", "5\n", "7\n"] #positions of the human side
+			rotate_needs =["3\n","6\n"] #rotation (human move command) is needed. position are in a different symmetry
+			hum_init = ["0", "2\n"] #initial position of the human arm
+			material_pos = ["3\n"] #position of the material which will be taken
+			table_pos = ["4\n"] #position where the material will be released
+			head_pos = ["5\n"] #default position of the head
+			head_changes = ["4\n"] #position of the head after movement
+			head_move_needed = ["4\n"] #the position movement of the arm where the head movement needed
 			arm_moves = {
 			"0" : {"1\n":[1.5, 0.0], "3\n": [[0.0, 1.25], [0.4, 0.0]], "5\n": [-0.5, 0.0]},
 			"1\n" : {"3\n":[[0.0, 1.25], [0.4, 0.0]], "5\n": [-2.0, 0.0] },
@@ -222,14 +225,14 @@ def main():
 						print("Operator's arm moves from %s to %s" % (A[3][k], A[3][k+1]))
 						simu.rpc('human', 'toggle_manipulation')
 						time.sleep(2)
-						if (A[4][k+1] == "5\n" and A[3][k+1] =="4\n") or (A[4][k] == "5\n" and A[3][k] =="4\n"):
+						if (A[4][k+1] in head_pos and A[3][k+1] in head_move_needed) or (A[4][k] in head_pos and A[3][k] in head_move_needed):
 							simu.rpc('human', 'move', head_moves[A[3][k]][A[3][k+1]][0][0], head_moves[A[3][k]][A[3][k+1]][0][1])
 							time.sleep(2)
 							simu.rpc('human', 'toggle_manipulation')
 							time.sleep(2)
 							simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][1][0], head_moves[A[3][k]][A[3][k+1]][1][1])
 							
-						elif (A[4][k+1] == "4\n" and A[3][k+1] =="4\n") or (A[4][k] == "4\n" and A[4][k] =="4\n"):
+						elif (A[4][k+1] in head_changes and A[3][k+1] in head_move_needed) or (A[4][k] in head_changes and A[3][k] in head_move_needed):
 							simu.rpc('human', 'move', head_moves[A[3][k]][A[3][k+1]][2][0], head_moves[A[3][k]][A[3][k+1]][2][1])
 							time.sleep(2)
 							simu.rpc('human', 'toggle_manipulation')
@@ -255,9 +258,9 @@ def main():
 						simu.rpc('human', 'move_hand', arm_moves[A[3][k]][A[3][k+1]][1][0], arm_moves[A[3][k]][A[3][k+1]][1][1])
 					elif (A[3][k] in rotate_needs and A[3][k+1] in rotate_needs) or (A[3][k] not in rotate_needs and A[3][k] not in hum_init and A[3][k+1] not in rotate_needs and A[3][k+1] not in hum_init):
 						print("Operator's arm moves from %s to %s" % (A[3][k], A[3][k+1]))
-						if (A[4][k+1] == "5\n" and A[3][k+1] =="4\n") or (A[4][k] == "5\n" and A[3][k] =="4\n"):
+						if (A[4][k+1] in head_pos and A[3][k+1] in head_move_needed) or (A[4][k] in head_pos and A[3][k] in head_move_needed):
 							simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][0][0], head_moves[A[3][k]][A[3][k+1]][0][1])
-						elif (A[4][k+1] == "4\n" and A[3][k+1] =="4\n") or (A[4][k] == "4\n" and A[4][k] =="4\n"):
+						elif (A[4][k+1] in head_changes and in head_move_needed) or (A[4][k] in head_pos and A[3][k] in head_move_needed):
 							simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][1][0], head_moves[A[3][k]][A[3][k+1]][1][1])
 						else:
 							simu.rpc('human', 'move_hand', arm_moves[A[3][k]][A[3][k+1]][0], arm_moves[A[3][k]][A[3][k+1]][1])
@@ -268,9 +271,9 @@ def main():
 						print("Operator's arm moves from %s to %s" % (A[3][k], A[3][k+1]))
 						simu.rpc('human', 'toggle_manipulation')
 						time.sleep(2)
-						if (A[4][k+1] == "5\n" and A[3][k+1] =="4\n") or (A[4][k] == "5\n" and A[3][k] =="4\n"):
+						if (A[4][k+1] in head_pos and A[3][k+1] in head_move_needed) or (A[4][k] in head_pos and A[3][k] in head_move_needed):
 							simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][0][0], head_moves[A[3][k]][A[3][k+1]][0][1])
-						elif (A[4][k+1] == "4\n" and A[3][k+1] =="4\n") or (A[4][k] == "4\n" and A[4][k] =="4\n"):
+						elif (A[4][k+1] in head_changes and A[3][k+1] in head_move_needed) or (A[4][k] == "4\n" and A[3][k] in head_move_needed):
 							simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][1][0], head_moves[A[3][k]][A[3][k+1]][1][1])
 						else:
 							simu.rpc('human', 'move_hand', arm_moves[A[3][k]][A[3][k+1]][0], arm_moves[A[3][k]][A[3][k+1]][1])
