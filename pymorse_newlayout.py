@@ -46,6 +46,8 @@ def main():
 	H=[]
 	T=[]
 	TT=[]
+	K=defaultdict(list)
+	
 	for hh in range(1,29):
 		H.append('HAZARD_RISK_%s'%hh)
 	for tt in range(1,29):
@@ -61,33 +63,38 @@ def main():
 		hazris.update({H[t]: 'hazard_risk %s'%(t+1)})
 		hazar_hit.update({Haz[t]: 'hazard %s'%(t+1)})
 		t=t+1
-	print(hazar_hit)
+	#print(hazar_hit)
 	z=False
-
+	memo_list=False
 	for p in parts:
 		position[parts[p]].append('0')
-
-	with open('output1.hist.txt', 'r') as f_orig:
+	for h in haz:
+		hazard[haz[h]].append(['0'])
+	with open('output3.hist.txt', 'r') as f_orig:
 		i = 0
 		for line in f_orig:
 			if (i > 1):
 				for p in parts:
 					if p in line:
-						position[parts[p]].append(line[-3:])
-			if (i > 0):
+						position[parts[p]].append(line[-3:])			
 				for h in haz:
-					if h in line :
-						hazard[haz[h]].append(line[-3:])
+					if h in line:
+						if memo_list == False:
+							hazard[haz[h]].append([])
+							memo_list = True
+						if memo_list == True:
+							hazard[haz[h]][i-1].append(line[-3:])
 						#pdb.set_trace()
 						z=True
-					elif h not in line and ("------ time" in line or "------ end" in line) and z == False:
-						hazard[haz[h]].append('0')
+					if h not in line and ("------ time" in line or "------ end" in line) and z == False:
+						hazard[haz[h]].append(['0'])
 				for j in hazris:
 					if j in line :
 						hazardrisk[hazris[j]].append(line[-2:])
 			if "------ time" in line:
 				i += 1
 				z=False
+				memo_list = False
 
 	with open('Hazards.lisp', 'r') as f_haz:
 		for line in f_haz:
@@ -98,7 +105,7 @@ def main():
 				
 
 	A=[position['link_1'], position['link_2'], position['base'], position['arm'], position['head'], position['endeff']]
-	B=[hazard['hazard_type']]
+	B=hazard['hazard_type']
 	C=[]
 	D=[]
 	E=[]
@@ -117,9 +124,9 @@ def main():
 	m=len(A[0])
 	print(A)
 	print(B)
-	print(C)
-	print(D)
-	print(E)
+	print(K)
+	#print(D)
+	#print(E)
 	with Morse("localhost", 4000)  as simu:
 
 		esc= 0
@@ -285,11 +292,22 @@ def main():
 							simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][1][0], head_moves[A[3][k]][A[3][k+1]][1][1])
 						else:
 							simu.rpc('human', 'move_hand', arm_moves[A[3][k]][A[3][k+1]][0], arm_moves[A[3][k]][A[3][k+1]][1])
-					if B[0][k+1]== '0':
-						print("There is no hazard occured.")
+					if len(B[k+1])== 1:
+						if B[k+1][0]== '0':
+							print("There is no hazard occured.")
+						else:
+							for i in D:
+								if B[k+1][0] == i:
+									o=D.index(i)
+									print("Hazard number %s occured."%(o+1))
+									if (o>=0) and (o<=15):
+										print("Tr on %s by %s"%(E[o][0], E[o][1]))
+									elif (o<=16) and (o>=28):
+										print("Qs on %s by %s"%(E[o][0], E[o][1]))
+									print("Hazard number %s has a risk value %s" %((o+1), C[o][k+1]))
 					else:
 						for i in D:
-							if B[0][k+1] == i:
+							if B[k+1][-1] == i:
 								o=D.index(i)
 								print("Hazard number %s occured."%(o+1))
 								if (o>=0) and (o<=15):
