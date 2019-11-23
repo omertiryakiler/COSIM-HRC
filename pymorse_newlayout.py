@@ -26,7 +26,7 @@ def getchar():
 def main():
 	position = defaultdict(list)
 	parts = defaultdict()
-	parts = {'BASE_1_IN_L_': 'base', 'LINK1_1_IN_L_': 'link_1','LINK2_1_IN_L_': 'link_2','ENDEFF_1_IN_L_': 'endeff','OPERATOR_1_ARM_AREA_IN_L_': 'arm', 'OPERATOR_1_HEAD_AREA_IN_L_': 'head'}
+	parts = {'OPERATOR_1_LEG_AREA_IN_L_': 'leg', 'LINK1_1_IN_L_': 'link_1','LINK2_1_IN_L_': 'link_2','ENDEFF_1_IN_L_': 'endeff','OPERATOR_1_ARM_AREA_IN_L_': 'arm', 'OPERATOR_1_HEAD_AREA_IN_L_': 'head'}
 #dealing with time = 0
 	hazard = defaultdict(list)
 	haz = defaultdict()
@@ -104,7 +104,7 @@ def main():
 					hazard_explanation[hazar_hit[ha]].append(line.split("`")[2].split(" ")[0])
 				
 
-	A=[position['link_1'], position['link_2'], position['base'], position['arm'], position['head'], position['endeff']]
+	A=[position['link_1'], position['link_2'], position['leg'], position['arm'], position['head'], position['endeff']]
 	B=hazard['hazard_type']
 	C=[]
 	D=[]
@@ -154,7 +154,12 @@ def main():
 			robot_init =["0", "_1\n", "22\n"] #initial position of the robot
 			lay_pos = ["15\n", "36\n"] #positions of the layout side
 			hum_pos = ["0", "14\n", "35\n"] #positions of the human side
-			rotate_needs = ["27\n","_6\n"] #rotation (human move command) is needed. position are in a different symmetry
+			hum_hand_init = ["0", "14\n"] 
+			hum_leg_init = ["0", "_5\n", "_9\n", "13\n", "14\n"] #human stays at 2_3 at the beginning, so these are all 2_ values
+			hum_reachability_from_init = ["0", "_5\n", "_6\n", "_9\n", "10\n", "13\n", "14\n", "15\n", "26\n", "27\n", "30\n", "31\n", "34\n", "35\n", "36\n"] #human's hand can reach at these positions from the initial position
+			hum_not_reach_outer = ["18\n"] #position where human's hand cannot reach (outer circle)
+			hum_not_reach_inner = ["11\n"] #position where human's hand cannot reach (inner circle)
+			rotate_needs = ["27\n","_6\n"] #rotation (human move command) is needed. positions are in a different symmetry
 			rotate_needs2 = ["10\n", "31\n"]
 			rotate_needs3 = ["_9\n", "30\n", "_5\n", "26\n"]
 			rotate_needs4 = ["13\n", "34\n"]
@@ -180,9 +185,30 @@ def main():
 			"31\n" : {"_5\n":[[0.0, 0.2617], [0.1, 0.0]], "_6\n": [[0.0, -0.2617], [0.6, 0.0]], "_9\n": [[0.0, 0.2617], [0.7, 0.0]], "10\n": [0.4, 0.0], "13\n": [[0.0, 1.8317], [0.6, 0.0]], "15\n": [[0.0, -0.5314], [0.6, 0.0]], "26\n": [[0.0, 0.2617], [0.1, 0.0]], "27\n": [[0.0, -0.2617], [0.2, 0.0]], "30\n": [[0.0, 0.2617], [0.3, 0.0]], "14\n": [0.0, -0.5314], "34\n": [[0.0, 1.8317], [0.2, 0.0]], "36\n": [[0.0, -0.5314], [0.2, 0.0]], "35\n": [[0.0, -0.5314], [-0.5, 0.0]]},
 			"34\n" : {"_5\n":[[0.0, -1.57], [0.1, 0.0]], "_6\n": [[0.0, -2.0933], [0.6, 0.0]], "_9\n": [[0.0, -1.57], [0.7, 0.0]], "10\n": [[0.0, -1.8317], [0.6, 0.0]], "13\n": [0.4, 0.0], "15\n": [[0.0, -2.355], [0.6, 0.0]], "26\n": [[0.0, -1.57], [0.1, 0.0]], "27\n": [[0.0, -2.0933], [0.2, 0.0]], "30\n": [[0.0, -1.57], [0.3, 0.0]], "31\n": [[0.0, -1.8317], [0.2, 0.0]], "14\n": [0.0, -2.355], "36\n": [[0.0, -2.355], [0.2, 0.0]], "35\n": [[0.0, -2.355], [-0.5, 0.0]]},
 			"36\n" : {"_5\n":[[0.0, 0.785], [0.1, 0.0]], "_6\n": [[0.0, 0.2617], [0.6, 0.0]], "_9\n": [[0.0, 0.785], [0.7, 0.0]], "10\n": [[0.0, 0.5314], [0.6, 0.0]], "13\n": [[0.0, 2.355], [0.6, 0.0]], "15\n": [0.4, 0.0], "26\n": [[0.0, 0.785], [0.1, 0.0]], "27\n": [[0.0, 0.2617], [0.2, 0.0]], "30\n": [[0.0, 0.785], [0.3, 0.0]], "31\n": [[0.0, 0.5314], [0.2, 0.0]], "34\n": [[0.0, 2.355], [0.2, 0.0]], "35\n": [-0.5, 0.0]},
-			"35\n" : {"_5\n":[[0.0, 0.785], [0.1, 0.0]], "_6\n": [[0.0, 0.2617], [0.6, 0.0]], "_9\n": [[0.0, 0.785], [0.7, 0.0]], "10\n": [[0.0, 0.5314], [0.6, 0.0]], "13\n": [[0.0, 2.355], [0.6, 0.0]], "15\n": [0.6, 0.0], "26\n": [[0.0, 0.785], [0.1, 0.0]], "27\n": [[0.0, 0.2617], [0.6, 0.0]], "30\n": [[0.0, 0.785], [0.3, 0.0]], "31\n": [[0.0, 0.5314], [0.6, 0.0]], "34\n": [[0.0, 2.355], [0.6, 0.0]], "36\n": [0.2, 0.0]}
+			"35\n" : {"_5\n":[[0.0, 0.785], [0.1, 0.0]], "_6\n": [[0.0, 0.2617], [0.6, 0.0]], "_9\n": [[0.0, 0.785], [0.7, 0.0]], "10\n": [[0.0, 0.5314], [0.6, 0.0]], "13\n": [[0.0, 2.355], [0.6, 0.0]], "15\n": [0.6, 0.0], "26\n": [[0.0, 0.785], [0.1, 0.0]], "27\n": [[0.0, 0.2617], [0.6, 0.0]], "30\n": [[0.0, 0.785], [0.3, 0.0]], "31\n": [[0.0, 0.5314], [0.6, 0.0]], "34\n": [[0.0, 2.355], [0.6, 0.0]], "36\n": [0.2, 0.0]},
+			"18\n" : {"11\n": [1.0, 0.0], "32\n": [0.4, 0.0], "39\n": [0.1, 0.0]}
 			}
-			head_moves = {
+			head_moves = { 
+			}
+			leg_moves = {
+			"0": {"11\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57], [0.5, 0.0]], "18\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57]]},
+			"_5\n": {"11\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57], [0.5, 0.0]], "18\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57]]},
+			"_6\n": {"11\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57], [0.5, 0.0]], "18\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57]]},
+			"_9\n": {"11\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57], [0.5, 0.0]], "18\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57]]},
+			"10\n": {"11\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57], [0.5, 0.0]], "18\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57]]},
+			"13\n": {"11\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57], [0.5, 0.0]], "18\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57]]},
+			"14\n": {"11\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57], [0.5, 0.0]], "18\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57]]},
+			"15\n": {"11\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57], [0.5, 0.0]], "18\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57]]},
+			"26\n": {"11\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57], [0.5, 0.0]], "18\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57]]},
+			"27\n": {"11\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57], [0.5, 0.0]], "18\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57]]},
+			"30\n": {"11\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57], [0.5, 0.0]], "18\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57]]},
+			"31\n": {"11\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57], [0.5, 0.0]], "18\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57]]},
+			"34\n": {"11\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57], [0.5, 0.0]], "18\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57]]},
+			"35\n": {"11\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57], [0.5, 0.0]], "18\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57]]},
+			"36\n": {"11\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57], [0.5, 0.0]], "18\n":[[0.0, -0.785], [1.3, 0.0], [0.0, 1.57], [1.3, 0.0], [0.0, 1.57]]}
+			}
+			arm_moves_diff = {"18\n": {"39\n":[0.7, 0.0]},
+			"11\n": {"39\n":[0.2, 0.0]}
 			}
 			rinitial = [0.0, 0.0, 0.0]
 			r1 = [3.14, 0.0, 0.0]
@@ -236,62 +262,96 @@ def main():
 							simu.rpc('robot.arm.gripper', 'release')
 					if A[3][k] == A[3][k+1] or (A[3][k] in no_move and A[3][k+1] in no_move):
 						print("Operators arm stays at %s" % (A[3][k]))
-					elif (((A[3][k] in rotate_needs and A[3][k+1] not in rotate_needs) or (A[3][k] in rotate_needs2 and A[3][k+1] not in rotate_needs2) or (A[3][k] in rotate_needs3 and A[3][k+1] not in rotate_needs3) or (A[3][k] in rotate_needs4 and A[3][k+1] not in rotate_needs4)) and A[3][k+1] not in hum_init) or (((A[3][k] not in rotate_needs and A[3][k+1] in rotate_needs) or (A[3][k] not in rotate_needs2 and A[3][k+1] in rotate_needs2) or (A[3][k] not in rotate_needs3 and A[3][k+1] in rotate_needs3) or (A[3][k] not in rotate_needs4 and A[3][k+1] in rotate_needs4)) and A[3][k] not in hum_init):
-						print("Operator's arm moves from %s to %s" % (A[3][k], A[3][k+1]))
-						simu.rpc('human', 'toggle_manipulation')
-						time.sleep(2)
-						if (A[4][k+1] in head_pos and A[3][k+1] in head_move_needed) or (A[4][k] in head_pos and A[3][k] in head_move_needed):
-							simu.rpc('human', 'move', head_moves[A[3][k]][A[3][k+1]][0][0], head_moves[A[3][k]][A[3][k+1]][0][1])
-							time.sleep(2)
+					if (A[3][k+1] in hum_reachability_from_init and A[3][k] != A[3][k+1]):
+						if (((A[3][k] in rotate_needs and A[3][k+1] not in rotate_needs) or (A[3][k] in rotate_needs2 and A[3][k+1] not in rotate_needs2) or (A[3][k] in rotate_needs3 and A[3][k+1] not in rotate_needs3) or (A[3][k] in rotate_needs4 and A[3][k+1] not in rotate_needs4)) and A[3][k+1] not in hum_init) or (((A[3][k] not in rotate_needs and A[3][k+1] in rotate_needs) or (A[3][k] not in rotate_needs2 and A[3][k+1] in rotate_needs2) or (A[3][k] not in rotate_needs3 and A[3][k+1] in rotate_needs3) or (A[3][k] not in rotate_needs4 and A[3][k+1] in rotate_needs4)) and A[3][k] not in hum_init):
+							print("Operator's arm moves from %s to %s" % (A[3][k], A[3][k+1]))
 							simu.rpc('human', 'toggle_manipulation')
 							time.sleep(2)
-							simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][1][0], head_moves[A[3][k]][A[3][k+1]][1][1])
+							if (A[4][k+1] in head_pos and A[3][k+1] in head_move_needed) or (A[4][k] in head_pos and A[3][k] in head_move_needed):
+								simu.rpc('human', 'move', head_moves[A[3][k]][A[3][k+1]][0][0], head_moves[A[3][k]][A[3][k+1]][0][1])
+								time.sleep(2)
+								simu.rpc('human', 'toggle_manipulation')
+								time.sleep(2)
+								simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][1][0], head_moves[A[3][k]][A[3][k+1]][1][1])
 							
-						elif (A[4][k+1] in head_changes and A[3][k+1] in head_move_needed) or (A[4][k] in head_changes and A[3][k] in head_move_needed):
-							simu.rpc('human', 'move', head_moves[A[3][k]][A[3][k+1]][2][0], head_moves[A[3][k]][A[3][k+1]][2][1])
-							time.sleep(2)
+							elif (A[4][k+1] in head_changes and A[3][k+1] in head_move_needed) or (A[4][k] in head_changes and A[3][k] in head_move_needed):
+								simu.rpc('human', 'move', head_moves[A[3][k]][A[3][k+1]][2][0], head_moves[A[3][k]][A[3][k+1]][2][1])
+								time.sleep(2)
+								simu.rpc('human', 'toggle_manipulation')
+								time.sleep(2)
+								simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][3][0], head_moves[A[3][k]][A[3][k+1]][3][1])
+							else:
+								simu.rpc('human', 'move', arm_moves[A[3][k]][A[3][k+1]][0][0], arm_moves[A[3][k]][A[3][k+1]][0][1])
+								time.sleep(2)
+								simu.rpc('human', 'toggle_manipulation')
+								time.sleep(2)
+								simu.rpc('human', 'move_hand', arm_moves[A[3][k]][A[3][k+1]][1][0], arm_moves[A[3][k]][A[3][k+1]][1][1])
+						elif (A[3][k] in rotate_needs or A[3][k] in rotate_needs2 or A[3][k] in rotate_needs3 or A[3][k] in rotate_needs4) and A[3][k+1] in hum_init:
+							print("Operator's arm moves from %s to %s" % (A[3][k], A[3][k+1]))
 							simu.rpc('human', 'toggle_manipulation')
 							time.sleep(2)
-							simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][3][0], head_moves[A[3][k]][A[3][k+1]][3][1])
-						else:
+							simu.rpc('human', 'move', arm_moves[A[3][k]][A[3][k+1]][0], arm_moves[A[3][k]][A[3][k+1]][1])
+						elif A[3][k] in hum_init and (A[3][k+1] in rotate_needs or A[3][k+1] in rotate_needs2 or A[3][k+1] in rotate_needs3 or A[3][k+1] in rotate_needs4):
+							print("Operator's arm moves from %s to %s" % (A[3][k], A[3][k+1]))
 							simu.rpc('human', 'move', arm_moves[A[3][k]][A[3][k+1]][0][0], arm_moves[A[3][k]][A[3][k+1]][0][1])
 							time.sleep(2)
 							simu.rpc('human', 'toggle_manipulation')
 							time.sleep(2)
 							simu.rpc('human', 'move_hand', arm_moves[A[3][k]][A[3][k+1]][1][0], arm_moves[A[3][k]][A[3][k+1]][1][1])
-					elif (A[3][k] in rotate_needs or A[3][k] in rotate_needs2 or A[3][k] in rotate_needs3 or A[3][k] in rotate_needs4) and A[3][k+1] in hum_init:
-						print("Operator's arm moves from %s to %s" % (A[3][k], A[3][k+1]))
-						simu.rpc('human', 'toggle_manipulation')
-						time.sleep(2)
-						simu.rpc('human', 'move', arm_moves[A[3][k]][A[3][k+1]][0], arm_moves[A[3][k]][A[3][k+1]][1])
-					elif A[3][k] in hum_init and (A[3][k+1] in rotate_needs or A[3][k+1] in rotate_needs2 or A[3][k+1] in rotate_needs3 or A[3][k+1] in rotate_needs4):
-						print("Operator's arm moves from %s to %s" % (A[3][k], A[3][k+1]))
-						simu.rpc('human', 'move', arm_moves[A[3][k]][A[3][k+1]][0][0], arm_moves[A[3][k]][A[3][k+1]][0][1])
-						time.sleep(2)
-						simu.rpc('human', 'toggle_manipulation')
-						time.sleep(2)
-						simu.rpc('human', 'move_hand', arm_moves[A[3][k]][A[3][k+1]][1][0], arm_moves[A[3][k]][A[3][k+1]][1][1])
-					elif ((A[3][k] in rotate_needs and A[3][k+1] in rotate_needs) or (A[3][k] in rotate_needs2 and A[3][k+1] in rotate_needs2) or (A[3][k] in rotate_needs3 and A[3][k+1] in rotate_needs3) or (A[3][k] in rotate_needs4 and A[3][k+1] in rotate_needs4)) or ((A[3][k] not in rotate_needs or A[3][k] not in rotate_needs2 or A[3][k] not in rotate_needs3 or A[3][k] not in rotate_needs4) and A[3][k] not in hum_init and (A[3][k+1] not in rotate_needs or A[3][k+1] not in rotate_needs2 or A[3][k+1] not in rotate_needs3 or A[3][k+1] not in rotate_needs4) and A[3][k+1] not in hum_init):
-						print("Operator's arm moves from %s to %s" % (A[3][k], A[3][k+1]))
-						if (A[4][k+1] in head_pos and A[3][k+1] in head_move_needed) or (A[4][k] in head_pos and A[3][k] in head_move_needed):
-							simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][0][0], head_moves[A[3][k]][A[3][k+1]][0][1])
-						elif (A[4][k+1] in head_changes and A[3][k+1] in head_move_needed) or (A[4][k] == "4\n" and A[3][k] =="4\n"):
-							simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][1][0], head_moves[A[3][k]][A[3][k+1]][1][1])
+						elif ((A[3][k] in rotate_needs and A[3][k+1] in rotate_needs) or (A[3][k] in rotate_needs2 and A[3][k+1] in rotate_needs2) or (A[3][k] in rotate_needs3 and A[3][k+1] in rotate_needs3) or (A[3][k] in rotate_needs4 and A[3][k+1] in rotate_needs4)) or ((A[3][k] not in rotate_needs or A[3][k] not in rotate_needs2 or A[3][k] not in rotate_needs3 or A[3][k] not in rotate_needs4) and A[3][k] not in hum_init and (A[3][k+1] not in rotate_needs or A[3][k+1] not in rotate_needs2 or A[3][k+1] not in rotate_needs3 or A[3][k+1] not in rotate_needs4) and A[3][k+1] not in hum_init):
+							print("Operator's arm moves from %s to %s" % (A[3][k], A[3][k+1]))
+							if (A[4][k+1] in head_pos and A[3][k+1] in head_move_needed) or (A[4][k] in head_pos and A[3][k] in head_move_needed):
+								simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][0][0], head_moves[A[3][k]][A[3][k+1]][0][1])
+							elif (A[4][k+1] in head_changes and A[3][k+1] in head_move_needed) or (A[4][k] == "4\n" and A[3][k] =="4\n"):
+								simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][1][0], head_moves[A[3][k]][A[3][k+1]][1][1])
+							else:
+								simu.rpc('human', 'move_hand', arm_moves[A[3][k]][A[3][k+1]][0], arm_moves[A[3][k]][A[3][k+1]][1])
+						elif (A[3][k] not in rotate_needs or A[3][k] not in rotate_needs2 or A[3][k] not in rotate_needs3 or A[3][k] not in rotate_needs4) and A[3][k] not in hum_init and A[3][k+1] in hum_init:
+							print("Operator's arm moves from %s to %s" % (A[3][k], A[3][k+1]))
+							simu.rpc('human', 'toggle_manipulation')
+						elif A[3][k] in hum_init and (A[3][k+1] not in rotate_needs or [3][k+1] not in rotate_needs2 or [3][k+1] not in rotate_needs3 or [3][k+1] not in rotate_needs4):
+							print("Operator's arm moves from %s to %s" % (A[3][k], A[3][k+1]))
+							simu.rpc('human', 'toggle_manipulation')
+							time.sleep(2)
+							if (A[4][k+1] in head_pos and A[3][k+1] in head_move_needed) or (A[4][k] in head_pos and A[3][k] in head_move_needed):
+								simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][0][0], head_moves[A[3][k]][A[3][k+1]][0][1])
+							elif (A[4][k+1] in head_changes and A[3][k+1] in head_move_needed) or (A[4][k] in head_changes and A[3][k] in head_move_needed):
+								simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][1][0], head_moves[A[3][k]][A[3][k+1]][1][1])
+							else:
+								simu.rpc('human', 'move_hand', arm_moves[A[3][k]][A[3][k+1]][0], arm_moves[A[3][k]][A[3][k+1]][1])
+					elif A[2][k] in hum_reachability_from_init and A[3][k+1] not in hum_reachability_from_init and A[2][k+1] not in hum_reachability_from_init:
+						print("Operator walks from the initial position to %s" %(A[2][k+1]))
+						if A[3][k] not in hum_hand_init:
+							simu.rpc('human', 'toggle_manipulation')
+						simu.rpc('human', 'move', leg_moves[A[2][k]][A[2][k+1]][0][0], leg_moves[A[2][k]][A[2][k+1]][0][1])
+						time.sleep(1)
+						simu.rpc('human', 'move', leg_moves[A[2][k]][A[2][k+1]][1][0], leg_moves[A[2][k]][A[2][k+1]][1][1])
+						time.sleep(1)
+						simu.rpc('human', 'move', leg_moves[A[2][k]][A[2][k+1]][2][0], leg_moves[A[2][k]][A[2][k+1]][2][1])
+						time.sleep(1)
+						simu.rpc('human', 'move', leg_moves[A[2][k]][A[2][k+1]][3][0], leg_moves[A[2][k]][A[2][k+1]][3][1])
+						time.sleep(1)
+						simu.rpc('human', 'move', leg_moves[A[2][k]][A[2][k+1]][4][0], leg_moves[A[2][k]][A[2][k+1]][4][1])
+						time.sleep(1)
+						if A[2][k+1] in hum_not_reach_inner:
+							simu.rpc('human', 'move', leg_moves[A[2][k]][A[2][k+1]][5][0], leg_moves[A[2][k]][A[2][k+1]][5][1])
+						if A[3][k+1] not in hum_not_reach_outer or A[3][k+1] not in hum_not_reach_inner:
+							print("Operator's arm moves from %s to %s" %(A[2][k+1], A[3][k+1])) #when human comes to the new position, leg and arm at the same position, so I took A[2][k+1]
+							simu.rpc('human', 'toggle_manipulation')
+							time.sleep(1)
+							simu.rpc('human', 'move', arm_moves_diff[A[2][k+1]][A[3][k+1]][0], arm_moves_diff[A[2][k+1]][A[3][k+1]][1])
+					elif (A[2][k] not in hum_reachability_from_init and A[2][k+1] not in hum_reachability_from_init):
+						if A[3][k]==A[3][k+1]:
+							print("Operator's arm stays at %s" %(A[3][k]))
 						else:
-							simu.rpc('human', 'move_hand', arm_moves[A[3][k]][A[3][k+1]][0], arm_moves[A[3][k]][A[3][k+1]][1])
-					elif (A[3][k] not in rotate_needs or A[3][k] not in rotate_needs2 or A[3][k] not in rotate_needs3 or A[3][k] not in rotate_needs4) and A[3][k] not in hum_init and A[3][k+1] in hum_init:
-						print("Operator's arm moves from %s to %s" % (A[3][k], A[3][k+1]))
-						simu.rpc('human', 'toggle_manipulation')
-					elif A[3][k] in hum_init and (A[3][k+1] not in rotate_needs or [3][k+1] not in rotate_needs2 or [3][k+1] not in rotate_needs3 or [3][k+1] not in rotate_needs4):
-						print("Operator's arm moves from %s to %s" % (A[3][k], A[3][k+1]))
-						simu.rpc('human', 'toggle_manipulation')
-						time.sleep(2)
-						if (A[4][k+1] in head_pos and A[3][k+1] in head_move_needed) or (A[4][k] in head_pos and A[3][k] in head_move_needed):
-							simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][0][0], head_moves[A[3][k]][A[3][k+1]][0][1])
-						elif (A[4][k+1] in head_changes and A[3][k+1] in head_move_needed) or (A[4][k] in head_changes and A[3][k] in head_move_needed):
-							simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][1][0], head_moves[A[3][k]][A[3][k+1]][1][1])
-						else:
-							simu.rpc('human', 'move_hand', arm_moves[A[3][k]][A[3][k+1]][0], arm_moves[A[3][k]][A[3][k+1]][1])
+							print("Operator's arm moves from %s to %s" %(A[3][k], A[3][k+1]))
+							if A[3][k+1] not in human_not_reach_outer:
+								if A[3][k] in human_not_reach_inner or A[3][k] in human_not_reach_outer:
+									simu.rpc('human', 'toggle_manipulation')
+								simu.rpc('human', 'move_hand', arm_moves[A[3][k]][A[3][k+1]][0], arm_moves[A[3][k]][A[3][k+1]][1])
+							if A[3][k+1] in human_not_reach_outer:
+								simu.rpc('human', 'toggle_manipulation')
+						
 					if len(B[k+1])== 1:
 						if B[k+1][0]== '0':
 							print("There is no hazard occured.")
