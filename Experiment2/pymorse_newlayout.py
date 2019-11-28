@@ -70,7 +70,7 @@ def main():
 		position[parts[p]].append('0')
 	for h in haz:
 		hazard[haz[h]].append(['0'])
-	with open('output3.hist.txt', 'r') as f_orig:
+	with open('output1.hist.txt', 'r') as f_orig:
 		i = 0
 		for line in f_orig:
 			if (i > 1):
@@ -122,9 +122,9 @@ def main():
 	k=0
 	n=len(A)
 	m=len(A[0])
-	print(A)
-	print(B)
-	print(K)
+	#print(A)
+	#print(B)
+	#print(K)
 	#print(D)
 	#print(E)
 	with Morse("localhost", 4000)  as simu:
@@ -210,7 +210,7 @@ def main():
 			if (c == "7"):
 				while (k>=0) and (k<=(m-2)):
 					time.sleep(3) #in each time interval, it waits for 3 seconds to ensure the completion of movement
-					print("----- From time %s to time %s -----"%(k, k+1))
+					print("----- Time %s -----"%(k+1))
 					if (A[5][k] == A[5][k+1]) or (A[5][k] in robot_init and A[5][k+1] in robot_init):
 						print("Robot stays at %s" % (A[5][k]))
 					else:
@@ -250,7 +250,7 @@ def main():
 							tab_pos=True
 							print("Robot releases the material")
 							simu.rpc('robot.arm.gripper', 'release')
-					if A[3][k] == A[3][k+1] or (A[3][k] in no_move and A[3][k+1] in no_move):
+					if (A[3][k] == A[3][k+1] or (A[3][k] in no_move and A[3][k+1] in no_move)) and (A[3][k+1] in hum_reachability_from_init):
 						print("Operators arm stays at %s" % (A[3][k]))
 					if (A[3][k+1] in hum_reachability_from_init and A[3][k] != A[3][k+1]):
 						if (((A[3][k] in rotate_needs and A[3][k+1] not in rotate_needs) or (A[3][k] in rotate_needs2 and A[3][k+1] not in rotate_needs2) or (A[3][k] in rotate_needs3 and A[3][k+1] not in rotate_needs3) or (A[3][k] in rotate_needs4 and A[3][k+1] not in rotate_needs4)) and A[3][k+1] not in hum_init) or (((A[3][k] not in rotate_needs and A[3][k+1] in rotate_needs) or (A[3][k] not in rotate_needs2 and A[3][k+1] in rotate_needs2) or (A[3][k] not in rotate_needs3 and A[3][k+1] in rotate_needs3) or (A[3][k] not in rotate_needs4 and A[3][k+1] in rotate_needs4)) and A[3][k] not in hum_init):
