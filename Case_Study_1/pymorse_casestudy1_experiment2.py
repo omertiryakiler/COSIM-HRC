@@ -70,7 +70,7 @@ def main():
 		position[parts[p]].append('0')
 	for h in haz:
 		hazard[haz[h]].append(['0'])
-	with open('output1.hist.txt', 'r') as f_orig:
+	with open('output3.hist.txt', 'r') as f_orig:
 		i = 0
 		for line in f_orig:
 			if (i > 1):
