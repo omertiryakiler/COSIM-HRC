@@ -61,7 +61,7 @@ def main():
 		hazris.update({H[t]: 'hazard_risk %s'%(t+1)})
 		hazar_hit.update({Haz[t]: 'hazard %s'%(t+1)})
 		t=t+1
-	print(hazar_hit)
+	#print(hazar_hit)
 	z=False
 
 	for p in parts:
@@ -115,11 +115,11 @@ def main():
 	k=0
 	n=len(A)
 	m=len(A[0])
-	print(A)
-	print(B)
-	print(C)
-	print(D)
-	print(E)
+	#print(A)
+	#print(B)
+	#print(C)
+	#print(D)
+	#print(E)
 	with Morse("localhost", 4000)  as simu:
 
 		esc= 0
@@ -179,7 +179,7 @@ def main():
 			if (c == "7"):
 				while (k>=0) and (k<=(m-2)):
 					time.sleep(5) #in each time interval, it waits for 2 seconds to ensure the completion of movement
-					print("----- From time %s to time %s -----"%(k, k+1))
+					print("----- Time %s -----"%(k+1))
 					if A[5][k] == A[5][k+1]:
 						print("Robot stays at %s" % (A[5][k]))
 					else:
@@ -260,7 +260,7 @@ def main():
 						print("Operator's arm moves from %s to %s" % (A[3][k], A[3][k+1]))
 						if (A[4][k+1] in head_pos and A[3][k+1] in head_move_needed) or (A[4][k] in head_pos and A[3][k] in head_move_needed):
 							simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][0][0], head_moves[A[3][k]][A[3][k+1]][0][1])
-						elif (A[4][k+1] in head_changes and in head_move_needed) or (A[4][k] in head_pos and A[3][k] in head_move_needed):
+						elif (A[4][k+1] in head_changes and A[3][k+1] in head_move_needed) or (A[4][k] in head_pos and A[3][k] in head_move_needed):
 							simu.rpc('human', 'move_hand', head_moves[A[3][k]][A[3][k+1]][1][0], head_moves[A[3][k]][A[3][k+1]][1][1])
 						else:
 							simu.rpc('human', 'move_hand', arm_moves[A[3][k]][A[3][k+1]][0], arm_moves[A[3][k]][A[3][k+1]][1])
